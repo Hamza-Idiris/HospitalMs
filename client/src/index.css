@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body { @apply bg-paper text-ink font-sans antialiased; }
+:focus-visible { outline: 2px solid #0E7C74; outline-offset: 2px; }
+.input { @apply w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:bg-slate-100; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50; }
+.btn-primary { @apply btn bg-brand text-white hover:bg-brand-dark; }
+.btn-ghost { @apply btn border border-slate-300 bg-white text-ink hover:bg-slate-50; }
+.btn-danger { @apply btn bg-danger text-white hover:opacity-90; }
+.btn-sm { @apply px-3 py-1.5 text-xs; }
+.th { @apply px-3 py-2 text-left text-xs font-semibold text-slate-500; }
+.td { @apply px-3 py-2.5 text-sm align-top; }
+
+/* Receipt-friendly print layout (80mm thermal) */
+#receipt-print { display: none; }
+@media print {
+  body * { visibility: hidden; }
+  #receipt-print, #receipt-print * { visibility: visible; }
+  #receipt-print { display: block; position: absolute; left: 0; top: 0; width: 76mm; padding: 2mm; font-family: 'Courier New', monospace; font-size: 11px; color: #000; }
+  @page { size: 80mm auto; margin: 2mm; }
+}

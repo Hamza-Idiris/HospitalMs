@@ -8,8 +8,7 @@ import { cx, dt } from './ui';
 const NAV = {
   super_admin: [['/admin', 'Overview'], ['/admin/hospitals', 'Hospitals'], ['/admin/audit', 'Audit logs']],
   manager: [['/manager', 'Overview'], ['/manager/patients', 'Patients'], ['/manager/staff', 'Staff'], ['/manager/departments', 'Departments'], ['/manager/services', 'Services & prices'], ['/manager/payments', 'Payments'], ['/manager/reports', 'Reports'], ['/manager/audit', 'Audit logs']],
-  receptionist: [['/reception', 'Overview'], ['/reception/register', 'Register patient'], ['/reception/patients', 'Find patient'], ['/reception/visits', 'Today’s visits']],
-  cashier: [['/cashier', 'Overview'], ['/cashier/pending', 'Pending payments'], ['/cashier/history', 'Payment history']],
+  cashier: [['/cashier', 'Overview'], ['/cashier/register', 'Register patient'], ['/cashier/patients', 'Find patient'], ['/cashier/visits', 'Today’s visits'], ['/cashier/pending', 'Pending payments'], ['/cashier/history', 'Payment history']],
   doctor: [['/doctor', 'My queue'], ['/doctor/patients', 'My patients'], ['/doctor/orders', 'Orders & results'], ['/doctor/follow-ups', 'Follow-ups']],
   lab: [['/laboratory', 'Lab requests']],
   xray: [['/xray', 'X-Ray requests']],

@@ -4,8 +4,8 @@ import { api } from './api';
 const Ctx = createContext(null);
 export const useAuth = () => useContext(Ctx);
 
-export const HOME = { super_admin: '/admin', manager: '/manager', receptionist: '/reception', cashier: '/cashier', doctor: '/doctor', lab: '/laboratory', xray: '/xray', pharmacist: '/pharmacy' };
-export const ROLE_LABEL = { super_admin: 'Super Admin', manager: 'Hospital Manager', receptionist: 'Receptionist', cashier: 'Cashier', doctor: 'Doctor', lab: 'Laboratory Technician', xray: 'X-Ray Technician', pharmacist: 'Pharmacist' };
+export const HOME = { super_admin: '/admin', manager: '/manager', cashier: '/cashier', doctor: '/doctor', lab: '/laboratory', xray: '/xray', pharmacist: '/pharmacy' };
+export const ROLE_LABEL = { super_admin: 'Super Admin', manager: 'Hospital Manager', cashier: 'Cashier', doctor: 'Doctor', lab: 'Laboratory Technician', xray: 'X-Ray Technician', pharmacist: 'Pharmacist' };
 
 export function AuthProvider({ children }) {
   const [state, setState] = useState({ loading: !!localStorage.getItem('hms_token'), user: null, hospital: null });

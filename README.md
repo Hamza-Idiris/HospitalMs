@@ -20,7 +20,6 @@ npm run dev:client      # App on http://localhost:5173
 |---|---|---|
 | Super Admin | admin@hms.local | Admin@12345 |
 | Hospital Manager | manager@demo.local | Password@123 |
-| Receptionist | reception@demo.local | Password@123 |
 | Cashier | cashier@demo.local | Password@123 |
 | Doctor (Orthopedics) | doctor@demo.local | Password@123 |
 | Doctor (General Medicine) | doctor2@demo.local | Password@123 |
@@ -31,7 +30,7 @@ npm run dev:client      # App on http://localhost:5173
 **Change all of these before any real use.** Use `SUPER_ADMIN_*` in `server/.env` to set your own admin before seeding.
 
 ### Try the full workflow
-1. Receptionist: **Register patient** → **Create visit** (department → doctor). A consultation charge is queued.
+1. Cashier: **Register patient** → **Create visit** (department → doctor). A consultation charge is queued.
 2. Cashier: **Pending payments** → receive payment → print receipt (RC-000001).
 3. Doctor: open the patient from **My queue** → consultation → order a lab test / X-ray, write a prescription.
 4. Cashier pays the lab/X-ray charge → Lab/X-Ray technician **Start** → enter result/report (attachments allowed).

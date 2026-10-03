@@ -11,7 +11,7 @@ export default function PatientSearch({ title = 'Find patient' }) {
   const [q, setQ] = useState('');
   const [visitFor, setVisitFor] = useState(null);
   const { data, isLoading } = useQuery({ queryKey: ['patients', q], queryFn: () => get('/patients', { q }) });
-  const canVisit = ['receptionist', 'manager'].includes(user.role);
+  const canVisit = ['cashier', 'manager'].includes(user.role);
   return (
     <>
       <PageHeader title={title} subtitle="Search by patient ID, name or phone number" />

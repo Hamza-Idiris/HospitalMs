@@ -5,7 +5,7 @@ import { useAuth } from '../auth';
 import { PageHeader, Stat, Loading, Card, Badge, Empty, human, money, dt, Table } from '../components/ui';
 
 const MONEY = ['todaysRevenue', 'outstandingBalance', 'totalCollectedToday'];
-const TITLES = { super_admin: 'Platform overview', manager: 'Hospital overview', receptionist: 'Front desk', cashier: 'Cashier desk', doctor: 'My day', lab: 'Laboratory', xray: 'X-Ray department', pharmacist: 'Pharmacy' };
+const TITLES = { super_admin: 'Platform overview', manager: 'Hospital overview', cashier: 'Cashier desk', doctor: 'My day', lab: 'Laboratory', xray: 'X-Ray department', pharmacist: 'Pharmacy' };
 
 export default function Dashboard() {
   const { user, hospital } = useAuth();

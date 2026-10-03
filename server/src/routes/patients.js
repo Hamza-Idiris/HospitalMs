@@ -31,7 +31,7 @@ const normalize = (d) => {
   return out;
 };
 
-r.post('/', authorize('receptionist', 'manager'), asyncH(async (req, res) => {
+r.post('/', authorize('cashier', 'manager'), asyncH(async (req, res) => {
   const d = schema.parse(req.body);
   // Duplicate prevention: same name + phone in the same hospital
   const dup = await Patient.findOne({ hospitalId: req.hospitalId, phone: d.phone, fullName: new RegExp(`^${escapeRegex(d.fullName.trim())}$`, 'i') });
@@ -54,7 +54,7 @@ r.get('/', asyncH(async (req, res) => {
 
 r.get('/:id', asyncH(async (req, res) => res.json(await findPatientFor(req, req.params.id))));
 
-r.put('/:id', authorize('receptionist', 'manager'), asyncH(async (req, res) => {
+r.put('/:id', authorize('cashier', 'manager'), asyncH(async (req, res) => {
   const patient = await findPatientFor(req, req.params.id);
   const d = schema.innerType().partial().parse(req.body);
   Object.assign(patient, normalize(d));
@@ -65,7 +65,7 @@ r.put('/:id', authorize('receptionist', 'manager'), asyncH(async (req, res) => {
 
 // Role-filtered patient profile (spec §32): each section depends on the caller's role.
 const SECTIONS = {
-  visits: ['manager', 'receptionist', 'doctor'],
+  visits: ['manager', 'cashier', 'doctor'],
   consultations: ['manager', 'doctor'],
   lab: ['manager', 'doctor', 'lab'],
   xray: ['manager', 'doctor', 'xray'],

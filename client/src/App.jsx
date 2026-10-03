@@ -43,12 +43,10 @@ export default function App() {
         <Route path="/manager/reports" element={G(['manager'], <Reports />)} />
         <Route path="/manager/audit" element={G(['manager'], <AuditLogs />)} />
 
-        <Route path="/reception" element={G(['receptionist'], <Dashboard />)} />
-        <Route path="/reception/register" element={G(['receptionist'], <RegisterPatient />)} />
-        <Route path="/reception/patients" element={G(['receptionist'], <PatientSearch />)} />
-        <Route path="/reception/visits" element={G(['receptionist'], <ReceptionVisits />)} />
-
         <Route path="/cashier" element={G(['cashier'], <Dashboard />)} />
+        <Route path="/cashier/register" element={G(['cashier'], <RegisterPatient />)} />
+        <Route path="/cashier/patients" element={G(['cashier'], <PatientSearch />)} />
+        <Route path="/cashier/visits" element={G(['cashier'], <ReceptionVisits />)} />
         <Route path="/cashier/pending" element={G(['cashier'], <PendingPayments />)} />
         <Route path="/cashier/history" element={G(['cashier'], <PaymentHistory />)} />
 
@@ -62,7 +60,7 @@ export default function App() {
         <Route path="/xray" element={G(['xray'], <><Dashboard /><div className="mt-8"><TechOrders kind="xray" /></div></>)} />
         <Route path="/pharmacy" element={G(['pharmacist'], <><Dashboard /><div className="mt-8"><Pharmacy /></div></>)} />
 
-        <Route path="/patients/:id" element={G(['manager', 'receptionist', 'doctor', 'cashier', 'lab', 'xray', 'pharmacist'], <PatientProfile />)} />
+        <Route path="/patients/:id" element={G(['manager', 'doctor', 'cashier', 'lab', 'xray', 'pharmacist'], <PatientProfile />)} />
       </Route>
       <Route path="*" element={loading ? null : <Navigate to={user ? HOME[user.role] : '/login'} replace />} />
     </Routes>

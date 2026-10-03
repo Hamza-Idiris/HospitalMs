@@ -23,7 +23,7 @@ const Service = require('../models/Service');
       const services = [['Registration', 'registration', 1], ['Consultation', 'consultation', 10], ['CBC', 'laboratory', 8], ['Blood Sugar', 'laboratory', 3], ['Malaria Test', 'laboratory', 4], ['Liver Function Test', 'laboratory', 12], ['Chest X-Ray', 'xray', 15], ['Knee X-Ray', 'xray', 15], ['Spine X-Ray', 'xray', 18], ['Ultrasound', 'xray', 20]];
       for (const [name, category, price] of services) await Service.create({ hospitalId: h._id, name, category, price, priceHistory: [{ price }] });
       const pw = await hash('Password@123');
-      const staff = [['Hospital Manager', 'manager@demo.local', 'manager'], ['Amina Reception', 'reception@demo.local', 'receptionist'], ['Hassan Cashier', 'cashier@demo.local', 'cashier'],
+      const staff = [['Hospital Manager', 'manager@demo.local', 'manager'], ['Hassan Cashier', 'cashier@demo.local', 'cashier'],
         ['Dr. Mohamed Ali', 'doctor@demo.local', 'doctor', depts['Orthopedics']._id], ['Dr. Fadumo Nur', 'doctor2@demo.local', 'doctor', depts['General Medicine']._id],
         ['Lab User', 'lab@demo.local', 'lab'], ['Xray User', 'xray@demo.local', 'xray'], ['Pharmacy User', 'pharmacy@demo.local', 'pharmacist']];
       for (const [name, email, role, departmentId] of staff) await User.create({ hospitalId: h._id, name, email, role, departmentId, passwordHash: pw });

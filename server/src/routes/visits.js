@@ -19,7 +19,7 @@ const POP = [['patient', 'patientId fullName age gender phone'], ['department', 
 const populate = (q) => POP.reduce((qq, [p, f]) => qq.populate(p, f), q);
 
 // Patient -> Department -> Doctor (spec §17). Creates a visit and the consultation charge.
-r.post('/', authorize('receptionist', 'manager'), asyncH(async (req, res) => {
+r.post('/', authorize('cashier', 'manager'), asyncH(async (req, res) => {
   const d = z.object({ patientId: z.string(), departmentId: z.string(), doctorId: z.string(), chargeConsultation: z.boolean().default(true) }).parse(req.body);
   const patient = await findPatientFor(req, d.patientId);
   const dept = await Department.findOne({ _id: d.departmentId, hospitalId: req.hospitalId, isActive: true });
@@ -38,7 +38,7 @@ r.post('/', authorize('receptionist', 'manager'), asyncH(async (req, res) => {
   res.status(201).json({ visit, charge });
 }));
 
-r.get('/', authorize('manager', 'receptionist', 'doctor'), asyncH(async (req, res) => {
+r.get('/', authorize('manager', 'cashier', 'doctor'), asyncH(async (req, res) => {
   const q = { hospitalId: req.hospitalId };
   if (req.user.role === 'doctor') q.doctor = req.user._id; // DOCTOR ISOLATION
   else if (req.query.doctorId) q.doctor = req.query.doctorId;
@@ -48,12 +48,12 @@ r.get('/', authorize('manager', 'receptionist', 'doctor'), asyncH(async (req, re
   res.json(await populate(Visit.find(q).sort({ visitDate: -1 }).limit(200)));
 }));
 
-r.get('/:id', authorize('manager', 'receptionist', 'doctor'), asyncH(async (req, res) => {
+r.get('/:id', authorize('manager', 'cashier', 'doctor'), asyncH(async (req, res) => {
   const v = await findVisitFor(req, req.params.id);
   res.json(await populate(Visit.findById(v._id)));
 }));
 
-r.patch('/:id/status', authorize('manager', 'receptionist', 'doctor'), asyncH(async (req, res) => {
+r.patch('/:id/status', authorize('manager', 'cashier', 'doctor'), asyncH(async (req, res) => {
   const { status } = z.object({ status: z.enum(STATUSES) }).parse(req.body);
   const v = await findVisitFor(req, req.params.id);
   v.status = status; await v.save();

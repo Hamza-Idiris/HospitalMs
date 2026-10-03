@@ -55,15 +55,20 @@ r.get('/dashboard', asyncH(async (req, res) => {
     };
   } else if (role === 'cashier') {
     const t = await sumTx(h, startOfDay(), endOfDay());
-    out = { todaysPayments: t.n, totalCollectedToday: t.total, pendingPayments: await c(Payment, { status: { $in: ['pending', 'partial'] } }), receiptsToday: t.n };
+    out = {
+      todaysPayments: t.n,
+      totalCollectedToday: t.total,
+      pendingPayments: await c(Payment, { status: { $in: ['pending', 'partial'] } }),
+      registeredToday: await c(Patient, { createdAt: today }),
+      visitsToday: await c(Visit, { visitDate: today }),
+      waiting: await c(Visit, { status: 'waiting' }),
+    };
   } else if (role === 'lab') {
     out = { pendingTests: await c(LabOrder, { status: { $in: ['requested', 'paid'] } }), inProgress: await c(LabOrder, { status: 'in_progress' }), completedToday: await c(LabOrder, { status: 'completed', completedAt: today }) };
   } else if (role === 'xray') {
     out = { pendingRequests: await c(XrayOrder, { status: { $in: ['requested', 'paid'] } }), inProgress: await c(XrayOrder, { status: 'in_progress' }), completedToday: await c(XrayOrder, { status: 'completed', completedAt: today }) };
   } else if (role === 'pharmacist') {
     out = { pendingPrescriptions: await c(Prescription, { status: { $in: ['pending', 'partial'] } }), dispensedToday: await c(Prescription, { status: 'dispensed', updatedAt: today }) };
-  } else if (role === 'receptionist') {
-    out = { registeredToday: await c(Patient, { createdAt: today }), visitsToday: await c(Visit, { visitDate: today }), waiting: await c(Visit, { status: 'waiting' }) };
   }
   res.json(out);
 }));

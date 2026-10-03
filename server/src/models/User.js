@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ROLES = ['super_admin', 'manager', 'receptionist', 'cashier', 'doctor', 'lab', 'xray', 'pharmacist'];
+const ROLES = ['super_admin', 'manager', 'cashier', 'doctor', 'lab', 'xray', 'pharmacist'];
 const s = new mongoose.Schema({
   hospitalId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital', default: null, index: true },
   name: { type: String, required: true, trim: true },

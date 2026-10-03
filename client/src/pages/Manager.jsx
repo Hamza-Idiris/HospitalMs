@@ -54,12 +54,12 @@ export function Staff() {
 }
 function StaffForm({ user, onClose }) {
   const depts = useQuery({ queryKey: ['departments'], queryFn: () => get('/departments', { active: 'true' }) });
-  const { register, handleSubmit, watch } = useForm({ defaultValues: { ...user, departmentId: user.departmentId?._id || '', role: user.role || 'receptionist' } });
+  const { register, handleSubmit, watch } = useForm({ defaultValues: { ...user, departmentId: user.departmentId?._id || '', role: user.role || 'cashier' } });
   const m = useSave((d) => (user._id ? api.put(`/users/${user._id}`, d) : api.post('/users', d)), onClose);
   const role = watch('role');
   return <Modal title={user._id ? 'Edit staff member' : 'Add staff member'} onClose={onClose}><form className="space-y-4" onSubmit={handleSubmit((d) => { const { password, ...rest } = d; m.mutate(user._id ? rest : d); })}>
     <Input label="Full name" reg={register('name', { required: true })} /><Input label="Email" type="email" reg={register('email', { required: true })} /><Input label="Phone" reg={register('phone')} />
-    <Select label="Role" reg={register('role')}>{['receptionist', 'cashier', 'doctor', 'lab', 'xray', 'pharmacist'].map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</Select>
+    <Select label="Role" reg={register('role')}>{['cashier', 'doctor', 'lab', 'xray', 'pharmacist'].map((r) => <option key={r} value={r}>{ROLE_LABEL[r]}</option>)}</Select>
     {role === 'doctor' && <><Select label="Department" reg={register('departmentId')}><option value="">None</option>{depts.data?.map((d) => <option key={d._id} value={d._id}>{d.name}</option>)}</Select><Input label="Specialty" reg={register('specialty')} /></>}
     {!user._id && <Input label="Temporary password" type="password" hint="At least 8 characters" reg={register('password', { required: true, minLength: 8 })} />}
     <ErrorBox error={m.error} /><div className="flex justify-end gap-2"><button type="button" className="btn-ghost" onClick={onClose}>Cancel</button><button className="btn-primary">Save</button></div></form></Modal>;

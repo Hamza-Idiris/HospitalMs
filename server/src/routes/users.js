@@ -9,14 +9,14 @@ const audit = require('../utils/audit');
 const r = express.Router();
 r.use(authenticate, requireHospital);
 
-const STAFF = ['receptionist', 'cashier', 'doctor', 'lab', 'xray', 'pharmacist'];
+const STAFF = ['cashier', 'doctor', 'lab', 'xray', 'pharmacist'];
 const base = z.object({
   name: z.string().min(2), email: z.string().email(), phone: z.string().optional(),
   role: z.enum(STAFF), departmentId: z.string().optional().or(z.literal('')), specialty: z.string().optional(),
 });
 
-// Doctors list (reception needs it for visit assignment)
-r.get('/doctors', authorize('manager', 'receptionist'), asyncH(async (req, res) => {
+// Doctors list (cashier/reception needs it for visit assignment)
+r.get('/doctors', authorize('manager', 'cashier'), asyncH(async (req, res) => {
   const q = { hospitalId: req.hospitalId, role: 'doctor', isActive: true };
   if (req.query.departmentId) q.departmentId = req.query.departmentId;
   res.json(await User.find(q).select('name departmentId specialty').sort('name'));

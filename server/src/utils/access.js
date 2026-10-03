@@ -8,7 +8,7 @@ const Patient = require('../models/Patient');
 const { HttpError } = require('./helpers');
 
 // Which patients may each role see? (Hospital isolation is always applied via hospitalId.)
-const ALL_PATIENT_ROLES = ['manager', 'receptionist'];
+const ALL_PATIENT_ROLES = ['manager', 'cashier'];
 const relevantModel = (role, hospitalId, userId) => ({
   doctor: () => Visit.distinct('patient', { hospitalId, doctor: userId }), // DOCTOR ISOLATION
   cashier: () => Payment.distinct('patient', { hospitalId }),
@@ -30,7 +30,7 @@ async function canSeePatient(req, patientObjectId) {
   const h = req.hospitalId, p = patientObjectId;
   if (ALL_PATIENT_ROLES.includes(role)) return true;
   if (role === 'doctor') return !!(await Visit.exists({ hospitalId: h, patient: p, doctor: _id }));
-  if (role === 'cashier') return !!(await Payment.exists({ hospitalId: h, patient: p }));
+  if (role === 'cashier') return true;
   if (role === 'lab') return !!(await LabOrder.exists({ hospitalId: h, patient: p }));
   if (role === 'xray') return !!(await XrayOrder.exists({ hospitalId: h, patient: p }));
   if (role === 'pharmacist') return !!(await Prescription.exists({ hospitalId: h, patient: p }));

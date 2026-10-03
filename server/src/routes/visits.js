@@ -6,7 +6,7 @@ const User = require('../models/User');
 const Service = require('../models/Service');
 const { authenticate, authorize, requireHospital } = require('../middleware/auth');
 const { findPatientFor, findVisitFor } = require('../utils/access');
-const { asyncH, HttpError, startOfDay, endOfDay } = require('../utils/helpers');
+const { asyncH, HttpError, startOfDay, endOfDay, pad } = require('../utils/helpers');
 const { nextSeq } = require('../utils/counter');
 const { createCharge } = require('../utils/billing');
 const { notifyUser } = require('../utils/notify');
@@ -46,7 +46,6 @@ r.post('/', authorize('cashier', 'manager'), asyncH(async (req, res) => {
     if (svc) {
       charge = await createCharge({ hospitalId: req.hospitalId, patient: patient._id, visit: visit._id, service: svc, kind: 'visit', refId: visit._id, userId: req.user._id });
       if (d.amountReceived !== undefined && d.amountReceived > 0) {
-        const { applyDiscount } = require('./payments_helper') || {};
         // Process payment inline
         if (d.discount > 0) {
           const round2 = (v) => Math.round(v * 100) / 100;

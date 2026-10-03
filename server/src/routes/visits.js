@@ -18,24 +18,59 @@ const STATUSES = ['waiting', 'in_consultation', 'completed', 'referred', 'follow
 const POP = [['patient', 'patientId fullName age gender phone'], ['department', 'name'], ['doctor', 'name']];
 const populate = (q) => POP.reduce((qq, [p, f]) => qq.populate(p, f), q);
 
-// Patient -> Department -> Doctor (spec §17). Creates a visit and the consultation charge.
+// Patient -> Department -> Doctor. Creates a visit, charges consultation, and receives payment directly if provided.
 r.post('/', authorize('cashier', 'manager'), asyncH(async (req, res) => {
-  const d = z.object({ patientId: z.string(), departmentId: z.string(), doctorId: z.string(), chargeConsultation: z.boolean().default(true) }).parse(req.body);
+  const d = z.object({
+    patientId: z.string(), departmentId: z.string(), doctorId: z.string(),
+    chargeConsultation: z.boolean().default(true),
+    discount: z.coerce.number().min(0).default(0), discountReason: z.string().optional(),
+    amountReceived: z.coerce.number().min(0).optional(), paymentMethod: z.enum(['cash', 'evc_plus', 'edahab', 'card', 'other']).default('cash'),
+  }).parse(req.body);
+
   const patient = await findPatientFor(req, d.patientId);
   const dept = await Department.findOne({ _id: d.departmentId, hospitalId: req.hospitalId, isActive: true });
   if (!dept) throw new HttpError(400, 'Department not found or inactive');
   const doctor = await User.findOne({ _id: d.doctorId, hospitalId: req.hospitalId, role: 'doctor', isActive: true });
   if (!doctor) throw new HttpError(400, 'Doctor not found or inactive');
+
   const visitNo = await nextSeq(req.hospitalId, `visit:${patient._id}`);
-  const visit = await Visit.create({ hospitalId: req.hospitalId, patient: patient._id, visitNo, department: dept._id, doctor: doctor._id, createdBy: req.user._id });
+  const todayCount = await Visit.countDocuments({ hospitalId: req.hospitalId, visitDate: { $gte: startOfDay(), $lte: endOfDay() } });
+  const dailySeq = todayCount + 1;
+
+  const visit = await Visit.create({ hospitalId: req.hospitalId, patient: patient._id, visitNo, dailySeq, department: dept._id, doctor: doctor._id, createdBy: req.user._id });
   let charge = null;
+  let receiptNo = null;
+
   if (d.chargeConsultation) {
     const svc = await Service.findOne({ hospitalId: req.hospitalId, category: 'consultation', isActive: true }).sort('createdAt');
-    if (svc) charge = await createCharge({ hospitalId: req.hospitalId, patient: patient._id, visit: visit._id, service: svc, kind: 'visit', refId: visit._id, userId: req.user._id });
+    if (svc) {
+      charge = await createCharge({ hospitalId: req.hospitalId, patient: patient._id, visit: visit._id, service: svc, kind: 'visit', refId: visit._id, userId: req.user._id });
+      if (d.amountReceived !== undefined && d.amountReceived > 0) {
+        const { applyDiscount } = require('./payments_helper') || {};
+        // Process payment inline
+        if (d.discount > 0) {
+          const round2 = (v) => Math.round(v * 100) / 100;
+          charge.discount = d.discount;
+          charge.discountReason = d.discountReason;
+          charge.discountBy = req.user._id;
+          charge.discountAt = new Date();
+          charge.finalAmount = round2(charge.originalPrice - d.discount);
+          charge.balance = charge.finalAmount;
+        }
+        receiptNo = 'RC-' + pad(await nextSeq(req.hospitalId, 'receipt'));
+        const amt = Math.min(d.amountReceived, charge.balance);
+        charge.amountPaid = amt;
+        charge.balance = Math.max(0, charge.finalAmount - amt);
+        charge.status = charge.balance <= 0.001 ? 'paid' : 'partial';
+        charge.transactions.push({ receiptNo, amount: amt, method: d.paymentMethod, cashier: req.user._id });
+        await charge.save();
+      }
+    }
   }
+
   await notifyUser(req.hospitalId, doctor._id, `New patient assigned: ${patient.fullName}`, '/doctor');
-  audit(req, 'Visit created', 'Visit', visit._id, { patient: patient.patientId, visitNo });
-  res.status(201).json({ visit, charge });
+  audit(req, 'Visit created', 'Visit', visit._id, { patient: patient.patientId, visitNo, dailySeq });
+  res.status(201).json({ visit, charge, receiptNo, dailySeq });
 }));
 
 r.get('/', authorize('manager', 'cashier', 'doctor'), asyncH(async (req, res) => {

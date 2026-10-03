@@ -3,6 +3,7 @@ const R = (ref, req = true) => ({ type: mongoose.Schema.Types.ObjectId, ref, req
 const s = new mongoose.Schema({
   hospitalId: R('Hospital'), patient: R('Patient'),
   visitNo: { type: Number, required: true },
+  dailySeq: { type: Number },
   department: R('Department'), doctor: R('User'),
   status: { type: String, enum: ['waiting', 'in_consultation', 'completed', 'referred', 'follow_up'], default: 'waiting' },
   visitDate: { type: Date, default: Date.now },

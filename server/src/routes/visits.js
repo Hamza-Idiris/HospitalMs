@@ -94,4 +94,21 @@ r.patch('/:id/status', authorize('manager', 'cashier', 'doctor'), asyncH(async (
   audit(req, 'Visit status changed', 'Visit', v._id, { status });
   res.json(v);
 }));
+
+r.put('/:id', authorize('cashier', 'manager'), asyncH(async (req, res) => {
+  const d = z.object({ departmentId: z.string(), doctorId: z.string() }).parse(req.body);
+  const v = await findVisitFor(req, req.params.id);
+  const dept = await Department.findOne({ _id: d.departmentId, hospitalId: req.hospitalId, isActive: true });
+  if (!dept) throw new HttpError(400, 'Department not found or inactive');
+  const doctor = await User.findOne({ _id: d.doctorId, hospitalId: req.hospitalId, role: 'doctor', isActive: true });
+  if (!doctor) throw new HttpError(400, 'Doctor not found or inactive');
+
+  v.department = dept._id;
+  v.doctor = doctor._id;
+  await v.save();
+
+  await notifyUser(req.hospitalId, doctor._id, `Patient reassigned to you: ${v.patient?.fullName || 'Patient'}`, '/doctor');
+  audit(req, 'Visit department/doctor updated', 'Visit', v._id, { department: dept.name, doctor: doctor.name });
+  res.json(await populate(Visit.findById(v._id)));
+}));
 module.exports = r;
